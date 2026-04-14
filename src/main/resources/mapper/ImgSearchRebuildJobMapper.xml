@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.imagesearchformal.mapper.ImgSearchRebuildJobMapper">
+
+    <update id="markRunning">
+        update img_search_rebuild_job
+        set status = 1,
+            start_time = now(),
+            update_time = now()
+        where id = #{jobId}
+          and status = 0
+    </update>
+
+    <update id="addSuccessCount">
+        update img_search_rebuild_job
+        set success_count = success_count + #{count},
+            update_time = now()
+        where id = #{jobId}
+    </update>
+
+    <update id="addFailCount">
+        update img_search_rebuild_job
+        set fail_count = fail_count + #{count},
+            update_time = now()
+        where id = #{jobId}
+    </update>
+
+    <update id="markFinished">
+        update img_search_rebuild_job
+        set status = 2,
+            finish_time = now(),
+            update_time = now()
+        where id = #{jobId}
+    </update>
+
+    <update id="markStopped">
+        update img_search_rebuild_job
+        set status = 3,
+            remark = #{remark},
+            finish_time = now(),
+            update_time = now()
+        where id = #{jobId}
+    </update>
+
+</mapper>

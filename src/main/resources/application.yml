@@ -1,0 +1,58 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: image-search-formal
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/image_search_demo?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: auto
+        default-requeue-rejected: false
+        prefetch: 5
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+
+image-search:
+  enabled: true
+  provider: ALIYUN
+  region-id: cn-shanghai
+  endpoint: imagesearch.cn-shanghai.aliyuncs.com
+  access-key-id: YOUR_ACCESS_KEY_ID
+  access-key-secret: YOUR_ACCESS_KEY_SECRET
+  instance-name: YOUR_INSTANCE_NAME
+  biz-type: SKU_IMAGE
+  default-score-threshold: 0.85
+  default-top-k: 20
+  search-distinct-product: true
+  crop: true
+  max-retry-count: 5
+  mq:
+    exchange: img.search.exchange
+    routing-key: img.search.sync
+    queue: img.search.sync.queue
+
+logging:
+  level:
+    root: INFO
+    com.example.imagesearchformal: INFO

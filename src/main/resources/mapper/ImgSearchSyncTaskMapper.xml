@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.imagesearchformal.mapper.ImgSearchSyncTaskMapper">
+
+    <update id="markRunning">
+        update img_search_sync_task
+        set status = 1,
+            start_time = now(),
+            update_time = now()
+        where id = #{taskId}
+          and status in (0, 3)
+    </update>
+
+    <update id="markSuccess">
+        update img_search_sync_task
+        set status = 2,
+            request_id = #{requestId},
+            finish_time = now(),
+            update_time = now()
+        where id = #{taskId}
+    </update>
+
+    <update id="markRetry">
+        update img_search_sync_task
+        set status = 3,
+            retry_count = retry_count + 1,
+            error_code = #{errorCode},
+            error_msg = #{errorMsg},
+            next_retry_time = #{nextRetryTime},
+            update_time = now()
+        where id = #{taskId}
+    </update>
+
+    <update id="markDead">
+        update img_search_sync_task
+        set status = 4,
+            error_code = #{errorCode},
+            error_msg = #{errorMsg},
+            finish_time = now(),
+            update_time = now()
+        where id = #{taskId}
+    </update>
+
+    <update id="markCanceled">
+        update img_search_sync_task
+        set status = 5,
+            error_msg = #{reason},
+            finish_time = now(),
+            update_time = now()
+        where id = #{taskId}
+    </update>
+
+    <select id="selectRetryableTaskList" resultType="com.example.imagesearchformal.domain.entity.ImgSearchSyncTask">
+        select *
+        from img_search_sync_task
+        where status = 3
+          and next_retry_time is not null
+          and next_retry_time <![CDATA[ <= ]]> #{now}
+        order by next_retry_time asc, id asc
+        limit #{limitSize}
+    </select>
+
+</mapper>

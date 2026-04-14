@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.imagesearchformal.mapper.ImgSearchImageMapper">
+
+    <select id="selectByInstanceIdAndImageId" resultType="com.example.imagesearchformal.domain.entity.ImgSearchImage">
+        select *
+        from img_search_image
+        where instance_id = #{instanceId}
+          and image_id = #{imageId}
+        limit 1
+    </select>
+
+    <select id="selectByProductIdAndPicName" resultType="com.example.imagesearchformal.domain.entity.ImgSearchImage">
+        select *
+        from img_search_image
+        where instance_id = #{instanceId}
+          and product_id = #{productId}
+          and pic_name = #{picName}
+        limit 1
+    </select>
+
+    <select id="selectPageForRebuild" resultType="com.example.imagesearchformal.domain.entity.ImgSearchImage">
+        select *
+        from img_search_image
+        where instance_id = #{instanceId}
+          and id &gt; #{lastId}
+          and id &lt;= #{snapshotMaxId}
+          and deleted = 0
+          and indexable_flag = 1
+        order by id asc
+        limit #{limitSize}
+    </select>
+
+    <update id="updateSyncing">
+        update img_search_image
+        set sync_status = 1,
+            update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateSyncSuccess">
+        update img_search_image
+        set sync_status = 2,
+            last_request_id = #{requestId},
+            last_sync_time = now(),
+            last_error_code = null,
+            last_error_msg = null,
+            update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateSyncDeleted">
+        update img_search_image
+        set sync_status = 4,
+            last_request_id = #{requestId},
+            last_sync_time = now(),
+            last_error_code = null,
+            last_error_msg = null,
+            update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateSyncFail">
+        update img_search_image
+        set sync_status = 3,
+            last_error_code = #{errorCode},
+            last_error_msg = #{errorMsg},
+            update_time = now()
+        where id = #{id}
+    </update>
+
+</mapper>
